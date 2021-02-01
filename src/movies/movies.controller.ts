@@ -1,11 +1,17 @@
 import { Controller, Delete, Get, Param, Post, Patch, Body, Query } from '@nestjs/common';
+import { Movie } from './entities/movie.entity';
+import { MoviesService } from './movies.service';
 
 @Controller('movies')
 export class MoviesController {
-
+    
+    // expressjs에서는 수동으로 import를 통해서 service에 접근하지만
+    // nextjs에서는 요청을 통해서 service에 접근한다.
+    constructor(private readonly moviesService: MoviesService) { }
+    
     @Get()
-    getAll(){
-        return 'This will return all movies';
+    getAll() : Movie[] {
+        return this.moviesService.getAll();
     }
 
     @Get("search")
@@ -14,25 +20,22 @@ export class MoviesController {
     }
 
     @Get('/:id')
-    getOne(@Param('id') movieId: string){
-        return `This will return one movie with the id: ${movieId}`;
+    getOne(@Param('id') movieId: string): Movie{
+        return this.moviesService.getOne(movieId);
     }
 
     @Post()
     create(@Body() movieData){        
-        return movieData;
+        return this.moviesService.create(movieData);
     }
 
     @Delete('/:id')
     remove(@Param('id') movieId: string ){
-        return `This will delete a movie with the id: ${movieId}`;
+        return this.moviesService.deleteOne(movieId);
     }
 
     @Patch('/:id')
     patch(@Param('id') movieId: string, @Body() updateData){
-        return {
-            updatedMovie: movieId,
-            ...updateData,
-        };
+        return this.moviesService.update(movieId, updateData);
     }
 }
